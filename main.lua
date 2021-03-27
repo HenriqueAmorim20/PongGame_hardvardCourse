@@ -12,6 +12,7 @@ VIRTUAL_HEIGHT = 243
 
 PADDLE_SPEED = 200
 
+
 function love.load()
   love.graphics.setDefaultFilter('nearest', 'nearest')
 
