@@ -11,6 +11,8 @@ PADDLE_SPEED = 200
 function love.load()
   love.graphics.setDefaultFilter('nearest', 'nearest')
 
+  math.randomseed(os.time())
+
   smallFont = love.graphics.newFont('font.ttf', 8)
   scoreFont = love.graphics.newFont('font.ttf', 32)
   love.graphics.setFont(smallFont)
@@ -21,11 +23,19 @@ function love.load()
     vsync = true
   })
 
+  ballX = VIRTUAL_WIDTH / 2 - 2
+  ballY = VIRTUAL_HEIGHT / 2- 2
+
+  ballDX = math.random(2) == 1 and 100 or -100
+  ballDY = math.random(-50, 50)
+
   player1Score = 0
   player2Score = 0
 
   player1Y = 30
   player2Y = VIRTUAL_HEIGHT - 50
+
+  gameState = 'start'
 end
 
 function love.update(dt)
@@ -40,11 +50,28 @@ function love.update(dt)
   elseif love.keyboard.isDown('down') then
     player2Y = player2Y + PADDLE_SPEED * dt
   end
+
+  if gameState == 'play' then
+    ballX = ballX + ballDX * dt
+    ballY = ballY + ballDY * dt
+  end
 end
 
 function love.keypressed(key)
   if key == 'escape' then
     love.event.quit()
+  elseif key == 'enter' or key == 'return' then
+    if gameState == 'start' then
+      gameState = 'play'
+    else
+      gameState = 'start'
+
+      ballX = VIRTUAL_WIDTH / 2 - 2
+      ballY = VIRTUAL_HEIGHT / 2 - 2
+
+      ballDX = math.random(2) == 1 and 100 or -100
+      ballDY = math.random(-50, 50)
+    end
   end
 end
 
@@ -54,7 +81,11 @@ function love.draw()
   love.graphics.clear(40/255, 45/255, 52/255, 255/255)
 
   love.graphics.setFont(smallFont)
-  love.graphics.printf('Hello Pong!', 0, 20, VIRTUAL_WIDTH, 'center')
+  if gameState == 'start' then
+    love.graphics.printf('Start state!', 0, 20, VIRTUAL_WIDTH, 'center')
+  else
+    love.graphics.printf('Play State!', 0, 20, VIRTUAL_WIDTH, 'center')
+  end
 
   love.graphics.setFont(scoreFont)
   love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - 50, VIRTUAL_HEIGHT / 3)
@@ -62,7 +93,7 @@ function love.draw()
 
   love.graphics.rectangle('fill', 10, player1Y, 5, 20)
   love.graphics.rectangle('fill', VIRTUAL_WIDTH - 10, player2Y, 5, 20)
-  love.graphics.rectangle('fill', VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
+  love.graphics.rectangle('fill', ballX, ballY, 4, 4)
 
   push:apply('end')
 end
